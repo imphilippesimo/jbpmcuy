@@ -1,0 +1,22 @@
+{
+    "jbpmcuyApp": {
+        "office" : {
+            "home": {
+                "title": "Offices",
+                "createLabel": "Créer un nouveau Office",
+                "createOrEditLabel": "Créer ou éditer un Office"
+            },
+            "created": "Un nouveau Office a été créé avec l'identifiant {{ param }}",
+            "updated": "Le Office avec l'identifiant {{ param }} a été mis à jour",
+            "deleted": "Le Office avec l'identifiant {{ param }} a été supprimé",
+            "delete": {
+                "question": "Etes-vous certain de vouloir supprimer le Office {{ id }} ?"
+            },
+            "detail": {
+                "title": "Office"
+            },
+            "name": "Name",
+            "user": "User"
+        }
+    }
+}

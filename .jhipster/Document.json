@@ -1,0 +1,35 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "user",
+            "otherEntityName": "user",
+            "relationshipType": "many-to-one",
+            "otherEntityField": "login",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "document"
+        }
+    ],
+    "fields": [
+        {
+            "fieldName": "docRef",
+            "fieldType": "String",
+            "fieldValidateRules": [
+                "required"
+            ]
+        },
+        {
+            "fieldName": "treated",
+            "fieldType": "Boolean"
+        },
+        {
+            "fieldName": "validated",
+            "fieldType": "Boolean"
+        }
+    ],
+    "changelogDate": "20170427173237",
+    "dto": "no",
+    "service": "no",
+    "entityTableName": "document",
+    "pagination": "no"
+}

@@ -1,0 +1,35 @@
+
+<div>
+    <h2><span data-translate="jbpmcuyApp.document.detail.title">Document</span> {{vm.document.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span data-translate="jbpmcuyApp.document.docRef">Doc Ref</span></dt>
+        <dd>
+            <span>{{vm.document.docRef}}</span>
+        </dd>
+        <dt><span data-translate="jbpmcuyApp.document.treated">Treated</span></dt>
+        <dd>
+            <span>{{vm.document.treated}}</span>
+        </dd>
+        <dt><span data-translate="jbpmcuyApp.document.validated">Validated</span></dt>
+        <dd>
+            <span>{{vm.document.validated}}</span>
+        </dd>
+        <dt><span data-translate="jbpmcuyApp.document.user">User</span></dt>
+        <dd>
+            {{vm.document.user.login}}
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span data-translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="document-detail.edit({id:vm.document.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-sm-down" data-translate="entity.action.edit"> Edit</span>
+    </button>
+</div>
