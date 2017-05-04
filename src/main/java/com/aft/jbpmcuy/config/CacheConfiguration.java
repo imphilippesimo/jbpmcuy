@@ -22,30 +22,34 @@ import io.github.jhipster.config.JHipsterProperties;
 @AutoConfigureBefore(value = { WebConfigurer.class, DatabaseConfiguration.class })
 public class CacheConfiguration {
 
-    private final javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration;
+	private final javax.cache.configuration.Configuration<Object, Object> jcacheConfiguration;
 
-    public CacheConfiguration(JHipsterProperties jHipsterProperties) {
-        JHipsterProperties.Cache.Ehcache ehcache =
-            jHipsterProperties.getCache().getEhcache();
+	public CacheConfiguration(JHipsterProperties jHipsterProperties) {
+		JHipsterProperties.Cache.Ehcache ehcache = jHipsterProperties.getCache().getEhcache();
 
-        jcacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(
-            CacheConfigurationBuilder.newCacheConfigurationBuilder(Object.class, Object.class,
-                ResourcePoolsBuilder.heap(ehcache.getMaxEntries()))
-                .withExpiry(Expirations.timeToLiveExpiration(Duration.of(ehcache.getTimeToLiveSeconds(), TimeUnit.SECONDS)))
-                .build());
-    }
+		jcacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(CacheConfigurationBuilder
+				.newCacheConfigurationBuilder(Object.class, Object.class,
+						ResourcePoolsBuilder.heap(ehcache.getMaxEntries()))
+				.withExpiry(
+						Expirations.timeToLiveExpiration(Duration.of(ehcache.getTimeToLiveSeconds(), TimeUnit.SECONDS)))
+				.build());
+	}
 
-    @Bean
-    public JCacheManagerCustomizer cacheManagerCustomizer() {
-        return cm -> {
-            cm.createCache(com.aft.jbpmcuy.domain.User.class.getName(), jcacheConfiguration);
-            cm.createCache(com.aft.jbpmcuy.domain.Authority.class.getName(), jcacheConfiguration);
-            cm.createCache(com.aft.jbpmcuy.domain.User.class.getName() + ".authorities", jcacheConfiguration);
-            cm.createCache(com.aft.jbpmcuy.domain.PersistentToken.class.getName(), jcacheConfiguration);
-            cm.createCache(com.aft.jbpmcuy.domain.User.class.getName() + ".persistentTokens", jcacheConfiguration);
-            cm.createCache(com.aft.jbpmcuy.domain.Document.class.getName(), jcacheConfiguration);
+	@Bean
+	public JCacheManagerCustomizer cacheManagerCustomizer() {
+		return cm -> {
+			cm.createCache(com.aft.jbpmcuy.domain.User.class.getName(), jcacheConfiguration);
+			cm.createCache(com.aft.jbpmcuy.domain.Authority.class.getName(), jcacheConfiguration);
+			cm.createCache(com.aft.jbpmcuy.domain.User.class.getName() + ".authorities", jcacheConfiguration);
+			cm.createCache(com.aft.jbpmcuy.domain.PersistentToken.class.getName(), jcacheConfiguration);
+			cm.createCache(com.aft.jbpmcuy.domain.User.class.getName() + ".persistentTokens", jcacheConfiguration);
+			cm.createCache(com.aft.jbpmcuy.domain.Document.class.getName(), jcacheConfiguration);
 
-            // jhipster-needle-ehcache-add-entry
-        };
-    }
+			cm.createCache(com.aft.jbpmcuy.domain.Office.class.getName(), jcacheConfiguration);
+			cm.createCache(com.aft.jbpmcuy.domain.Office.class.getName() + ".people", jcacheConfiguration);
+			cm.createCache(com.aft.jbpmcuy.domain.Person.class.getName(), jcacheConfiguration);
+			cm.createCache(com.aft.jbpmcuy.domain.Person.class.getName() + ".offices", jcacheConfiguration);
+			// jhipster-needle-ehcache-add-entry
+		};
+	}
 }
