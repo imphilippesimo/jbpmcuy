@@ -1,0 +1,29 @@
+{
+    "fluentMethods": true,
+    "relationships": [
+        {
+            "relationshipName": "user",
+            "otherEntityName": "user",
+            "relationshipType": "one-to-one",
+            "relationshipValidateRules": [
+                "required"
+            ],
+            "otherEntityField": "login",
+            "ownerSide": true,
+            "otherEntityRelationshipName": "person"
+        },
+        {
+            "relationshipName": "office",
+            "otherEntityName": "office",
+            "relationshipType": "many-to-many",
+            "ownerSide": false,
+            "otherEntityRelationshipName": "person"
+        }
+    ],
+    "fields": [],
+    "changelogDate": "20170428155419",
+    "dto": "no",
+    "service": "no",
+    "entityTableName": "person",
+    "pagination": "no"
+}

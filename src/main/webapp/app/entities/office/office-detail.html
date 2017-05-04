@@ -1,0 +1,29 @@
+
+<div>
+    <h2><span data-translate="jbpmcuyApp.office.detail.title">Office</span> {{vm.office.id}}</h2>
+    <hr>
+    <jhi-alert-error></jhi-alert-error>
+    <dl class="dl-horizontal jh-entity-details">
+        <dt><span data-translate="jbpmcuyApp.office.name">Name</span></dt>
+        <dd>
+            <span>{{vm.office.name}}</span>
+        </dd>
+        <dt><span data-translate="jbpmcuyApp.office.person">Person</span></dt>
+        <dd>
+            <span ng-repeat="person in vm.office.people">
+                <a ui-sref="person-detail({id: person.id})">{{person.id}}</a>{{$last ? '' : ', '}}
+            </span>
+        </dd>
+    </dl>
+
+    <button type="submit"
+            ui-sref="{{ vm.previousState }}"
+            class="btn btn-info">
+        <span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span data-translate="entity.action.back"> Back</span>
+    </button>
+
+    <button type="button" ui-sref="office-detail.edit({id:vm.office.id})" class="btn btn-primary">
+        <span class="glyphicon glyphicon-pencil"></span>
+        <span class="hidden-sm-down" data-translate="entity.action.edit"> Edit</span>
+    </button>
+</div>
