@@ -20,7 +20,7 @@
                 <tr>
                     <th><span data-translate="global.field.id">ID</span></th>
                     <th><span data-translate="jbpmcuyApp.office.name">Name</span></th>
-                    <th><span data-translate="jbpmcuyApp.office.person">Person</span></th>
+                    <th><span data-translate="jbpmcuyApp.office.person">Person(s)</span></th>
                     <th></th>
                 </tr>
             </thead>
@@ -30,7 +30,7 @@
                     <td>{{office.name}}</td>
                     <td>
                         <span ng-repeat="person in office.people">
-                            <a class="form-control-static" ui-sref="person-detail({id: person.id})">{{person.id}}</a>{{$last ? '' : ', '}}
+                            <a class="form-control-static" ui-sref="person-detail({id: person.id})">{{person.user.login}}</a>{{$last ? '' : ', '}}
                         </span>
                     </td>
                     <td class="text-right">

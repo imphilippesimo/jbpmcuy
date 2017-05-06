@@ -15,6 +15,7 @@ import org.springframework.boot.actuate.autoconfigure.MetricRepositoryAutoConfig
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
@@ -29,6 +30,14 @@ import io.github.jhipster.config.JHipsterConstants;
 public class JbpmcuyApp {
 
 	private static final Logger log = LoggerFactory.getLogger(JbpmcuyApp.class);
+
+	private static ConfigurableApplicationContext configurableSpringAppContext;
+
+	// private static JBPMService jBPMService;
+	//
+	// private static RuntimeManager manager;
+	//
+	// private static RuntimeEngine engine;
 
 	private final Environment env;
 
@@ -72,7 +81,18 @@ public class JbpmcuyApp {
 	public static void main(String[] args) throws UnknownHostException {
 		SpringApplication app = new SpringApplication(JbpmcuyApp.class);
 		DefaultProfileUtil.addDefaultProfile(app);
-		Environment env = app.run(args).getEnvironment();
+		configurableSpringAppContext = app.run(args);
+
+		/*
+		 * Getting reference on jbpmService resources to release them during app
+		 * shutdown
+		 */
+		// jBPMService =
+		// configurableSpringAppContext.getBean(JBPMService.class);
+		// manager = jBPMService.getRuntimeManager();
+		// engine = jBPMService.getRuntimeEngine();
+
+		Environment env = configurableSpringAppContext.getEnvironment();
 		String protocol = "http";
 		if (env.getProperty("server.ssl.key-store") != null) {
 			protocol = "https";
@@ -85,4 +105,10 @@ public class JbpmcuyApp {
 				env.getProperty("spring.application.name"), protocol, env.getProperty("server.port"), protocol,
 				InetAddress.getLocalHost().getHostAddress(), env.getProperty("server.port"), env.getActiveProfiles());
 	}
+
+	// @PreDestroy
+	// public void disposeJBPMResources() {
+	// log.info("\n Releasing jBPM hold resources ...");
+	// manager.disposeRuntimeEngine(engine);
+	// }
 }

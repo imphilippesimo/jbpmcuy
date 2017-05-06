@@ -3,6 +3,7 @@ package com.aft.jbpmcuy.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -58,10 +59,10 @@ public class JbpmServiceTest {
 
 	}
 
-	// @After
-	// public void afterTests() {
-	// deleteTestData();
-	// }
+	@After
+	public void afterTests() {
+		manager.disposeRuntimeEngine(jBPMService.getRuntimeEngine());
+	}
 
 	// private void deleteTestData() {
 	// officeRepository.delete(softwares);
@@ -120,12 +121,12 @@ public class JbpmServiceTest {
 
 	public void serviceMustBeReadyToStartCircuit() {
 		manager = jBPMService.getRuntimeManager();
-		engine = jBPMService.getRuntimeEngine();
+
 		// start all available processes
 		logger.info("Starting Circuits: \n");
 		for (CircuitDTO circuit : jBPMService.getAllCircuits()) {
-			logger.info("starting " + circuit.getCircuitName() + " ...");
-			jBPMService.startCircuit(circuit, "jeanne", "x/y/z");
+			logger.info("starting " + circuit.getCircuitName() + " ..." + "of id " + circuit.getCircuitId());
+			jBPMService.startCircuit(circuit.getCircuitId(), "jeanne", "x/y/z");
 		}
 
 	}

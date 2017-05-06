@@ -28,7 +28,7 @@
 
         <div class="form-group">
             <label data-translate="jbpmcuyApp.office.person" for="field_person">Person</label>
-            <select class="form-control" id="field_person" multiple name="person" ng-model="vm.office.people" ng-options="person as person.id for person in vm.people track by person.id" required></select>
+            <select class="form-control" id="field_person" multiple name="person" ng-model="vm.office.people" ng-options="person as person.user.login for person in vm.people track by person.id" required></select>
         </div>
         <div ng-show="editForm.person.$invalid">
             <p class="help-block"

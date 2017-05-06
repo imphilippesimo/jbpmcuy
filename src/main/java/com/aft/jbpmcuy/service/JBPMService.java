@@ -1,7 +1,6 @@
 package com.aft.jbpmcuy.service;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +32,7 @@ import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.manager.context.EmptyContext;
 import org.kie.internal.task.api.InternalTaskService;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.Resource;
@@ -55,12 +55,12 @@ import com.aft.jbpmcuy.service.util.DBUserGroupCallBack;
 // TODO: Do not forget to handle/personalize exceptions for this service
 @Service
 @Transactional
-public class JBPMService implements Serializable {
+public class JBPMService implements DisposableBean {
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	// private static final long serialVersionUID = 1L;
 	static Logger logger = Logger.getLogger(JBPMService.class);
 	private ApplicationContext context = new ClassPathXmlApplicationContext("spring-jBPMConfig.xml");
 	private PlatformTransactionManager tm;
@@ -107,12 +107,15 @@ public class JBPMService implements Serializable {
 
 	}
 
+	// public void disposeJBPMResources() {
+	// manager.disposeRuntimeEngine(getRuntimeEngine());
+	// }
+
 	public RuntimeManager getRuntimeManager() {
 		return manager;
 	}
 
-	public void setRuntimeManager() {
-		// manager.close();
+	private void setRuntimeManager() {
 		manager = RuntimeManagerFactory.Factory.get().newPerRequestRuntimeManager(runtimeEnvironment);
 	}
 
@@ -137,7 +140,7 @@ public class JBPMService implements Serializable {
 
 	}
 
-	public void addWorkflowDefs(String workflowDefsPath) throws IOException {
+	private void addWorkflowDefs(String workflowDefsPath) throws IOException {
 
 		PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 		// get the set of all bpmn resources under
@@ -256,14 +259,12 @@ public class JBPMService implements Serializable {
 		return getRuntimeEngine().getAuditService();
 	}
 
-	public void startCircuit(CircuitDTO circuit, String starter, String documentRef) {
+	public void startCircuit(String circuitId, String starter, String documentRef) {
 
 		// Map of process instance variables
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("starter", starter);
 		properties.put("documentRef", documentRef);
-
-		String circuitId = circuit.getCircuitId();
 
 		// start the process with these variables
 		getkieSession().startProcess(circuitId, properties);
@@ -297,7 +298,6 @@ public class JBPMService implements Serializable {
 	public CircuitInstanceDTO getCircuitInstanceById(Long circuitInstanceId, String potentialOwner) {
 		for (CircuitInstanceDTO cInstance : getCircuitInstances(potentialOwner))
 			if (cInstance.getProcessInstanceInfo().getProcessInstanceId().equals(circuitInstanceId))
-
 				return cInstance;
 		return null;
 	}
@@ -343,6 +343,13 @@ public class JBPMService implements Serializable {
 			if (circuit.getCircuitId().equals(circuitId))
 				return circuit;
 		return null;
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		logger.debug("\n=====Closing manager ...");
+		manager.close();
+
 	}
 
 }
