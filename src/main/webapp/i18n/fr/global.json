@@ -5,6 +5,8 @@
         "menu": {
             "home": "Accueil",
             "jhipster-needle-menu-add-element": "JHipster will add additional menu entries here (do not translate!)",
+             "circuits": "Processus",
+             "folders": "Dossiers",
             "entities": {
                 "main": "Entités",
                 "document": "Document",

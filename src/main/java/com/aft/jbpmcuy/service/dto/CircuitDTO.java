@@ -3,12 +3,18 @@
  */
 package com.aft.jbpmcuy.service.dto;
 
+import java.io.Serializable;
+
 /**
  * @author Philippe Simo
  *
  */
-public class CircuitDTO {
+public class CircuitDTO implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8297712761399177917L;
 	private String circuitName;
 	private String circuitId;
 
@@ -43,8 +49,7 @@ public class CircuitDTO {
 	 */
 	@Override
 	public String toString() {
-		return "SignatureCircuitDTO [circuitName=" + circuitName
-				+ ", circuitId=" + circuitId + "]";
+		return "SignatureCircuitDTO [circuitName=" + circuitName + ", circuitId=" + circuitId + "]";
 	}
 
 }

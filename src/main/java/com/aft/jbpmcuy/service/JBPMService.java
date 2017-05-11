@@ -40,6 +40,8 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.aft.jbpmcuy.domain.Document;
+import com.aft.jbpmcuy.repository.DocumentRepository;
 import com.aft.jbpmcuy.repository.OfficeRepository;
 import com.aft.jbpmcuy.repository.PersonRepository;
 import com.aft.jbpmcuy.repository.UserRepository;
@@ -77,12 +79,15 @@ public class JBPMService implements DisposableBean {
 
 	private PersonRepository personRepository;
 
+	private DocumentRepository documentRepository;
+
 	public JBPMService(OfficeRepository officeRepository, UserRepository userRepository,
-			PersonRepository personRepository) throws IOException {
+			PersonRepository personRepository, DocumentRepository documentRepository) throws IOException {
 
 		this.officeRepository = officeRepository;
 		this.userRepository = userRepository;
 		this.personRepository = personRepository;
+		this.documentRepository = documentRepository;
 		// Getting the transaction manager to do jBPM persistence
 		// transactions
 		tm = (PlatformTransactionManager) context.getBean("transactionManager");
@@ -302,7 +307,26 @@ public class JBPMService implements DisposableBean {
 		return null;
 	}
 
-	public void goToNextStep(CircuitStepDTO currentStep, String userName) {
+	public void goToNextStep(CircuitInstanceDTO currentCircuitInstance, String userName) {
+
+		// Get the document Reference
+		String docRef = currentCircuitInstance.getDocumentRef();
+
+		// Get the document Object
+		Document document = documentRepository.findOneByDocRef(docRef);
+
+		CircuitStepDTO currentStep = currentCircuitInstance.getCurrentStep();
+
+		// Get the action to be done
+		String action = currentStep.getStepTask().getName();
+
+		// Simulate checking logic
+		if (action.contains("technique")) {
+			document.setTreated(Boolean.TRUE);
+		} else {
+			document.setValidated(Boolean.TRUE);
+		}
+		documentRepository.save(document);
 
 		// Getting the task service out of the runtime manager
 		TaskService taskService = getTaskService();
