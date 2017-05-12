@@ -1,0 +1,55 @@
+<div>
+	<div class="row">
+		<div class="col-md-8 col-md-offset-2">
+			<h2 data-translate="circuits.title"
+				translate-values="{username: '{{vm.currentLogin}}'}">
+				Initializing a request as [<b>{{vm.currentLogin}}</b>]
+			</h2>
+
+			<div class="alert alert-success" ng-show="vm.success"
+				data-translate="circuits.messages.success">
+				<strong>The Circuit has been started!</strong>
+			</div>
+
+			<jhi-alert-error></jhi-alert-error>
+
+			<form name="startCircuitform" role="form" novalidate ng-submit="vm.send()"
+				show-validation>
+
+				<div class="form-group">
+					<label for="circuitId" data-translate="circuits.form.requestType">Request type</label> 
+					<select id="circuitId" name="circuitId" class="form-control"
+						ng-model="vm.currentCircuit"
+						ng-controller="CircuitsController as circuitsVm"
+						ng-options="circuit as circuit.circuitName for circuit in circuitsVm.circuits track by circuit.circuitId"
+						required>
+					</select>
+				</div>
+				<div ng-show="startCircuitform.circuitId.$invalid">
+					<p class="help-block" ng-show="startCircuitform.circuitId.$error.required"
+						data-translate="circuits.messages.validate.requestType.required">The request type is required.</p>
+				</div>
+				
+				<div class="form-group">
+					<label for="docRef" data-translate="circuits.form.folder">Request Folder</label> 
+					<select id="docRef" name="docRef" class="form-control"
+						ng-model="vm.currentDoc"
+						ng-controller="DocumentController as DocumentVm"
+						ng-options="document as document.docRef for document in DocumentVm.documents track by document.id"
+						required>
+					</select>
+				</div>
+				<div ng-show="startCircuitform.docRef.$invalid">
+					<p class="help-block" ng-show="startCircuitform.docRef.$error.required"
+						data-translate="circuits.messages.validate.requestFolder.required">The request folder is required.</p>
+				</div>
+
+				
+
+				<button type="submit" ng-disabled="startCircuitform.$invalid"
+					class="btn btn-primary" data-translate="circuits.form.button.send">Send</button>
+			</form>
+		</div>
+	</div>
+
+</div>

@@ -2,6 +2,7 @@ package com.aft.jbpmcuy.service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -214,10 +215,11 @@ public class JBPMService implements DisposableBean {
 					documentRef = documents.get(starters.size() - 1).getValue();
 				}
 
-				List<CircuitStepDTO> previousSteps = getCompletedStepsByProcessInstanceId(
-						pInstance.getProcessInstanceId());
+				// List<CircuitStepDTO> previousSteps =
+				// getCompletedStepsByProcessInstanceId(
+				// pInstance.getProcessInstanceId());
 
-				sCircuitIns = new CircuitInstanceDTO(pInstance, starter, documentRef, circuit, null, previousSteps);
+				sCircuitIns = new CircuitInstanceDTO(pInstance, starter, documentRef, circuit, null);
 
 				// among <user>'s awaiting task in the base...
 				for (TaskSummary awaitingTask : taskService.getTasksAssignedAsPotentialOwner(potentialOwner, null)) {
@@ -225,7 +227,9 @@ public class JBPMService implements DisposableBean {
 
 					// keep the one belonging to this process instance
 					if ((awaitingTask.getProcessInstanceId().equals(pInstance.getProcessInstanceId()))) {
-						sCircuitIns.setCurrentStep(new CircuitStepDTO(circuit, awaitingTask));
+
+						sCircuitIns.setCurrentStep(
+								new CircuitStepDTO(circuit, awaitingTask, getStepContent(awaitingTask.getId())));
 					}
 
 				}
@@ -295,9 +299,9 @@ public class JBPMService implements DisposableBean {
 
 	}
 
-	private TaskService getTaskService() {
+	private InternalTaskService getTaskService() {
 
-		return getRuntimeEngine().getTaskService();
+		return (InternalTaskService) getRuntimeEngine().getTaskService();
 	}
 
 	public CircuitInstanceDTO getCircuitInstanceById(Long circuitInstanceId, String potentialOwner) {
@@ -334,10 +338,9 @@ public class JBPMService implements DisposableBean {
 
 	}
 
-	public Map<String, Object> getStepContent(CircuitStepDTO currentStep) {
+	public Map<String, Object> getStepContent(Long taskId) {
 
-		Map<String, Object> result = ((InternalTaskService) getTaskService())
-				.getTaskContent(currentStep.getStepTask().getId());
+		Map<String, Object> result = ((InternalTaskService) getTaskService()).getTaskContent(taskId);
 		for (String entry : result.keySet())
 			logger.info(entry + " : " + result.get(entry));
 
@@ -346,16 +349,33 @@ public class JBPMService implements DisposableBean {
 	}
 
 	// Retrieve step execution history
-	public List<CircuitStepDTO> getCompletedStepsByProcessInstanceId(long processInstanceId) {
+	public List<CircuitStepDTO> getCompletedStepsByProcessInstanceId(CircuitInstanceDTO instance) {
 
-		List<TaskSummary> tasks = ((InternalTaskService) getTaskService())
-				.getCompletedTasksByProcessId(processInstanceId);
+		List<TaskSummary> tasks = getTaskService()
+				.getCompletedTasksByProcessId(instance.getProcessInstanceInfo().getProcessInstanceId());
 		List<CircuitStepDTO> result = new ArrayList<CircuitStepDTO>();
+
+		// we store task creation dates to set them as previous tasks end dates
+		List<Date> taskEndDates = new ArrayList<Date>();
+
 		for (TaskSummary taskSummary : tasks) {
 			logger.info("Task completed : " + taskSummary.toString());
 			String circuitId = taskSummary.getProcessId();
+			// storing the creation date (it will be the previous task end date)
+			taskEndDates.add(taskSummary.getCreatedOn());
 			CircuitDTO circuit = getCircuitById(circuitId);
-			result.add(new CircuitStepDTO(circuit, taskSummary));
+			result.add(new CircuitStepDTO(circuit, taskSummary, getStepContent(taskSummary.getId())));
+		}
+
+		// add the creation date of the next non completed task, to be set as
+		// the end date of the last completed task
+		taskEndDates.add(instance.getCurrentStep().getStepTask().getCreatedOn());
+
+		// update the completed tasks while setting their end dates
+		for (int i = 0; i < result.size(); i++) {
+			CircuitStepDTO step = result.get(i);
+			step.setEndDate(taskEndDates.get(i + 1));
+			result.set(i, step);
 		}
 
 		return result;

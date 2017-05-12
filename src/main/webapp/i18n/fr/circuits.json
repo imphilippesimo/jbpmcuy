@@ -1,0 +1,28 @@
+{
+	"circuits": {
+		"title": "Initialisation d'une requête en tant que [<b>{{username}}</b>]",
+		"form": {
+			"requestType": "Type de demande",
+			"folder": "Dossier de demande",
+			"button": {
+				"send": "Envoyer",
+				"cancel": "Annuler"
+			}
+		},
+		"messages": {
+			"error": {
+				"fail": "<strong>Une erreur est survenue !</strong> Votre profil n'a pas été sauvegardé.",
+				"emailexists": "<strong>Cet email est déjà utilisé !</strong> Veuillez en choisir un autre."
+			},
+			"success": "<strong>Le processus a été démarré avec succès!</strong>",
+			"validate": {
+				"requestType": {
+					"required": "Le type de demande est obligatoire."
+				},
+				"requestFolder": {
+					"required": "Le dossier objet de la demande est obligatoire."
+				}
+			}
+		}
+	}
+}

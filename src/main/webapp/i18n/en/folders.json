@@ -1,0 +1,27 @@
+{
+	"folders": {
+		"title": "Acting on the folder {{docRef}}",
+		"name": "Name",
+		"nature": "Nature",
+		"startedOn": "Initialized",
+		"initializer": "Initializer",
+		"task": {
+			"toDo": "Waiting for",
+			"status": "Status",
+			"inThisServiceSince": "In this service since",
+			"handledBy": "Handled By"
+		},
+		"action": {
+			"treat": "Treat",
+			"status": "Status"
+		},
+		"status": {
+			"title": "{{requestType}} : Treatment status for : {{docRef}}",
+			"name": "Name",
+			"services": "Services",
+			"entryDate": "Entry",
+			"exitDate": "Exit",
+			"handler": "Handler"
+		}
+	}
+}

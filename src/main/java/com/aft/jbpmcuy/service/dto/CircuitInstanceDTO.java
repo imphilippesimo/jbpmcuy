@@ -3,8 +3,6 @@
  */
 package com.aft.jbpmcuy.service.dto;
 
-import java.util.List;
-
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 
 /**
@@ -17,7 +15,7 @@ public class CircuitInstanceDTO {
 	private String starter;
 	private String documentRef;
 	private CircuitStepDTO currentStep;
-	private List<CircuitStepDTO> previousSteps;
+	// private List<CircuitStepDTO> previousSteps;
 
 	/**
 	 * @param processInstanceInfo
@@ -27,16 +25,19 @@ public class CircuitInstanceDTO {
 	 * @param currentStep
 	 * @param previousSteps
 	 */
-	public CircuitInstanceDTO(ProcessInstanceLog processInstanceInfo,
-			String starter, String documentRef, CircuitDTO circuit,
-			CircuitStepDTO currentStep, List<CircuitStepDTO> previousSteps) {
+	public CircuitInstanceDTO(ProcessInstanceLog processInstanceInfo, String starter, String documentRef,
+			CircuitDTO circuit, CircuitStepDTO currentStep) {
 		super();
 		this.processInstanceInfo = processInstanceInfo;
 		this.starter = starter;
 		this.documentRef = documentRef;
 		this.currentStep = currentStep;
 		this.circuit = circuit;
-		this.previousSteps = previousSteps;
+		// this.previousSteps = previousSteps;
+	}
+
+	public CircuitInstanceDTO() {
+		// TODO Auto-generated constructor stub
 	}
 
 	public String getStarter() {
@@ -72,9 +73,9 @@ public class CircuitInstanceDTO {
 		this.currentStep = currentStep;
 	}
 
-	public List<CircuitStepDTO> getPreviousSteps() {
-		return previousSteps;
-	}
+	// public List<CircuitStepDTO> getPreviousSteps() {
+	// return previousSteps;
+	// }
 
 	public String getDocumentRef() {
 		return documentRef;
@@ -82,10 +83,8 @@ public class CircuitInstanceDTO {
 
 	@Override
 	public String toString() {
-		return "CircuitInstanceDTO [processInstanceInfo=" + processInstanceInfo
-				+ ", circuit=" + circuit + ", starter=" + starter
-				+ ", documentRef=" + documentRef + ", currentStep="
-				+ currentStep + ", previousSteps=" + previousSteps + "]";
+		return "CircuitInstanceDTO [processInstanceInfo=" + processInstanceInfo + ", circuit=" + circuit + ", starter="
+				+ starter + ", documentRef=" + documentRef + ", currentStep=" + currentStep + "]";
 	}
 
 }

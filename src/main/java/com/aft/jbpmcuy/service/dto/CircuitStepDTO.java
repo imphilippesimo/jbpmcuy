@@ -3,6 +3,9 @@
  */
 package com.aft.jbpmcuy.service.dto;
 
+import java.util.Date;
+import java.util.Map;
+
 import org.kie.api.task.model.TaskSummary;
 
 /**
@@ -11,22 +14,32 @@ import org.kie.api.task.model.TaskSummary;
  */
 public class CircuitStepDTO {
 	private CircuitDTO circuit;
-
 	private TaskSummary stepTask;
+	private Map<String, Object> stepContent;
+	// The start date is already in the TaskSummary
+	private Date endDate;
 
 	/**
 	 * @param circuit
 	 * @param stepFolder
 	 * @param stepTask
+	 * @param map
 	 * @param banettes
 	 */
-	public CircuitStepDTO(CircuitDTO circuit,
-			TaskSummary stepTask) {
+	public CircuitStepDTO(CircuitDTO circuit, TaskSummary stepTask, Map<String, Object> stepContent) {
 		super();
 		this.circuit = circuit;
-
 		this.stepTask = stepTask;
+		this.stepContent = stepContent;
 
+	}
+
+	public Map<String, Object> getStepContent() {
+		return stepContent;
+	}
+
+	public void setStepContent(Map<String, Object> stepContent) {
+		this.stepContent = stepContent;
 	}
 
 	/**
@@ -66,8 +79,7 @@ public class CircuitStepDTO {
 	 */
 	@Override
 	public String toString() {
-		return "SignatureCircuitStepDTO [circuit=" + circuit + ",  stepTask="
-				+ stepTask + "]";
+		return "SignatureCircuitStepDTO [circuit=" + circuit + ",  stepTask=" + stepTask + "]";
 	}
 
 	/**
@@ -76,6 +88,14 @@ public class CircuitStepDTO {
 	public String getName() {
 
 		return this.stepTask.getName();
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
 	}
 
 }

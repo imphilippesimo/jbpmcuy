@@ -1,0 +1,23 @@
+<div>
+	<h2>
+		<span data-translate="folders.title"
+			translate-values="{docRef: '{{vm.docRef}}'}">Acting on the
+			folder: {{vm.docRef}}</span>
+	</h2>
+	<form name="folderDetailForm" role="form" novalidate ng-submit="vm.doTreatment()">
+
+
+		<button type="button" ui-sref="folders" class="btn btn-info">
+			<span class="glyphicon glyphicon-arrow-left"></span>&nbsp;<span
+				data-translate="entity.action.back"> Back</span>
+		</button>
+
+		<button type="submit" class="btn btn-primary"
+			data-translate="folders.action.treat">Treat</button>
+
+
+	</form>
+</div>
+
+
+

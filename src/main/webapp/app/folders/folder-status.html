@@ -1,0 +1,34 @@
+<div>
+	<h2>
+		<span data-translate="folders.status.title"
+			translate-values="{docRef: '{{vm.docRef}}', requestType: '{{vm.requestType}}'}">{{vm.requestType}}
+			: Treatment status for : {{vm.docRef}}</span>
+	</h2>
+
+	<div class="table-responsive">
+		<table class="jh-table table table-striped">
+			<thead>
+				<tr>
+					<th><span data-translate="folders.status.name">Name</span></th>
+					<th><span data-translate="folders.status.services">Services</span></th>
+					<th><span data-translate="folders.status.entryDate">Entry
+							Date</span></th>
+					<th><span data-translate="folders.status.exitDate">Exit
+							Date</span></th>
+					<th><span data-translate="folders.status.handler">Handler</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="step in vm.steps track by step.stepTask.id">
+					<td>{{step.stepTask.name}}</td>
+					<td>{{step.stepContent.GroupId}}</td>
+					<td>{{step.stepTask.createdOn | date : format : "fulldate"}}</td>
+					<td>{{step.endDate | date : format : "fulldate"}}</td>					
+					<td>{{step.stepTask.actualOwner.id}}</td>
+
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</div>

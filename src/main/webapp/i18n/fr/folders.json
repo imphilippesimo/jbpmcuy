@@ -1,0 +1,27 @@
+{
+	"folders": {
+		"title": "Agir sur le dossier {{docRef}}",
+		"name": "Nom",
+		"nature": "Nature",
+		"startedOn": "Initialisé le",
+		"initializer": "Initialisé par",
+		"task": {
+			"toDo": "En attente de",
+			"status": "Statut",
+			"inThisServiceSince": "Dans ce service depuis",
+			"handledBy": "Traité par"
+		},
+		"action": {
+			"treat": "Traiter",
+			"status": "Statut"
+		},
+		"status": {
+			"title": "{{requestType}} : Suivi de traitement du dossier : {{docRef}}",
+			"name": "Nom",
+			"services": "Bureau",
+			"entryDate": "Entrée",
+			"exitDate": "Sortie",
+			"handler": "Traité par"
+		}
+	}
+}

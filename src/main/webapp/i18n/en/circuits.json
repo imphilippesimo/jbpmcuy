@@ -1,0 +1,28 @@
+{
+	"circuits": {
+		"title": "Initializing a request as [<b>{{username}}</b>]",
+		"form": {
+			"requestType": "Request type",
+			"folder": "Request Folder",
+			"button": {
+				"send": "Send",
+				"cancel": "Cancel"
+			}
+		},
+		"messages": {
+			"error": {
+				"fail": "<strong>An error has occurred!</strong> circuits could not be saved.",
+				"emailexists": "<strong>Email is already in use!</strong> Please choose another one."
+			},
+			"success": "<strong>The Circuit has been started!</strong>",
+			"validate": {
+				"requestType": {
+					"required": "The request type is required."
+				},
+				"requestFolder": {
+					"required": "The request folder is required."
+				}
+			}
+		}
+	}
+}

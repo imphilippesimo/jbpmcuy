@@ -1,0 +1,71 @@
+<div>
+
+	<div class="table-responsive">
+		<table class="jh-table table table-striped">
+			<thead>
+				<tr>
+					<!--                     Process instance info: id -->
+					<th><span data-translate="global.field.id">ID</span></th>
+					<!--                     Folder Name -->
+					<th><span data-translate="folders.name">Name</span></th>
+					<!--                     Process Name -->
+					<th><span data-translate="folders.nature">Nature</span></th>
+					<!--                     Process instance info: start -->
+					<th><span data-translate="folders.startedOn">Initialized</span></th>
+					<!--                      Process instance info: starter -->
+					<th><span data-translate="folders.initializer">Initializer</span></th>
+					<!--                       Step task: name -->
+					<th><span data-translate="folders.task.toDo ">Waiting for</span></th>
+					<!--                       Step task: status -->
+					<th><span data-translate="folders.task.status">Status</span></th>
+					<!--                       Step task: createdOn -->
+					<th><span data-translate="folders.task.inThisServiceSince">In
+							this service since</span></th>
+					<!--                       Step task: actualOwner -->
+					<th><span data-translate="folders.task.handledBy">Handled
+							by</span></th>
+
+
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr
+					ng-repeat="folder in vm.folders track by folder.processInstanceInfo.processInstanceId">
+					<td>{{folder.processInstanceInfo.processInstanceId}}</td>
+					<td>{{folder.documentRef}}</td>
+					<td>{{folder.processInstanceInfo.processName}}</td>
+					<td>{{ folder.processInstanceInfo.start | date : format :
+						"fulldate"}}</td>
+					<td>{{folder.starter}}</td>
+					<td>{{folder.currentStep.stepTask.name}}</td>
+					<td>{{folder.currentStep.stepTask.status}}</td>
+					<td>{{ folder.currentStep.stepTask.createdOn | date : format :
+						"fulldate"}}</td>
+					<td>{{folder.currentStep.stepTask.actualOwner.id}}</td>
+
+					<td class="text-right"
+						ng-if="(folder.currentStep.stepTask.actualOwner.id==vm.currentLogin)||(!folder.currentStep.stepTask.actualOwner)">
+						<div class="btn-group flex-btn-group-container">
+							<button type="submit"
+								ui-sref="folder-detail({instanceId:folder.processInstanceInfo.processInstanceId, docRef:folder.documentRef, handler:folder.currentStep.stepTask.actualOwner.id})"
+								class="btn btn-info btn-sm">
+								<span class="glyphicon glyphicon-pencil"></span> <span
+									class="hidden-sm-down" data-translate="folders.action.treat"></span>
+							</button>
+							<button type="submit"
+								ui-sref="folder-status({instanceId:folder.processInstanceInfo.processInstanceId, docRef:folder.documentRef, requestType:folder.processInstanceInfo.processName})"
+								class="btn btn-primary btn-sm">
+								<span class="glyphicon glyphicon-eye-open"></span> <span
+									class="hidden-sm-down" data-translate="folders.action.status"></span>
+							</button>
+
+						</div>
+					</td>
+
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+</div>
