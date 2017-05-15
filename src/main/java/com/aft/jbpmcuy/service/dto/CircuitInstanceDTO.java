@@ -11,28 +11,20 @@ import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
  */
 public class CircuitInstanceDTO {
 	private ProcessInstanceLog processInstanceInfo;
-	private CircuitDTO circuit;
+	// private CircuitDTO circuit;
 	private String starter;
 	private String documentRef;
 	private CircuitStepDTO currentStep;
 	// private List<CircuitStepDTO> previousSteps;
 
-	/**
-	 * @param processInstanceInfo
-	 * @param starter
-	 * @param documentRef
-	 * @param circuit
-	 * @param currentStep
-	 * @param previousSteps
-	 */
 	public CircuitInstanceDTO(ProcessInstanceLog processInstanceInfo, String starter, String documentRef,
-			CircuitDTO circuit, CircuitStepDTO currentStep) {
+			/* CircuitDTO */ CircuitStepDTO currentStep) {
 		super();
 		this.processInstanceInfo = processInstanceInfo;
 		this.starter = starter;
 		this.documentRef = documentRef;
 		this.currentStep = currentStep;
-		this.circuit = circuit;
+		// this.circuit = circuit;
 		// this.previousSteps = previousSteps;
 	}
 
@@ -51,12 +43,12 @@ public class CircuitInstanceDTO {
 		return processInstanceInfo;
 	}
 
-	/**
-	 * @return the circuit referenced by this instance
-	 */
-	public CircuitDTO getCircuit() {
-		return this.circuit;
-	}
+	// /**
+	// * @return the circuit referenced by this instance
+	// */
+	// public CircuitDTO getCircuit() {
+	// return this.circuit;
+	// }
 
 	/**
 	 * @return the currentStep
@@ -79,12 +71,6 @@ public class CircuitInstanceDTO {
 
 	public String getDocumentRef() {
 		return documentRef;
-	}
-
-	@Override
-	public String toString() {
-		return "CircuitInstanceDTO [processInstanceInfo=" + processInstanceInfo + ", circuit=" + circuit + ", starter="
-				+ starter + ", documentRef=" + documentRef + ", currentStep=" + currentStep + "]";
 	}
 
 }

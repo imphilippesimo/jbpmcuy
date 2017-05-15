@@ -1,5 +1,5 @@
 <div>
-
+	<jhi-alert></jhi-alert>
 	<div class="table-responsive">
 		<table class="jh-table table table-striped">
 			<thead>
@@ -39,16 +39,15 @@
 						"fulldate"}}</td>
 					<td>{{folder.starter}}</td>
 					<td>{{folder.currentStep.stepTask.name}}</td>
-					<td>{{folder.currentStep.stepTask.status}}</td>
-					<td>{{ folder.currentStep.stepTask.createdOn | date : format :
+					<td>{{folder.currentStep.stepTask.taskData.status}}</td>
+					<td>{{ folder.currentStep.stepTask.taskData.createdOn | date : format :
 						"fulldate"}}</td>
-					<td>{{folder.currentStep.stepTask.actualOwner.id}}</td>
+					<td>{{folder.currentStep.stepTask.taskData.actualOwner.id}}</td>
 
-					<td class="text-right"
-						ng-if="(folder.currentStep.stepTask.actualOwner.id==vm.currentLogin)||(!folder.currentStep.stepTask.actualOwner)">
+					<td class="text-right">
 						<div class="btn-group flex-btn-group-container">
-							<button type="submit"
-								ui-sref="folder-detail({instanceId:folder.processInstanceInfo.processInstanceId, docRef:folder.documentRef, handler:folder.currentStep.stepTask.actualOwner.id})"
+							<button ng-if="((folder.currentStep.stepTask.taskData.actualOwner.id==vm.currentLogin)||(!folder.currentStep.stepTask.taskData.actualOwner))&&(folder.currentStep.treatable)" type="submit"
+								ui-sref="folder-detail({instanceId:folder.processInstanceInfo.processInstanceId, docRef:folder.documentRef, handler:folder.currentStep.stepTask.taskData.actualOwner.id})"
 								class="btn btn-info btn-sm">
 								<span class="glyphicon glyphicon-pencil"></span> <span
 									class="hidden-sm-down" data-translate="folders.action.treat"></span>

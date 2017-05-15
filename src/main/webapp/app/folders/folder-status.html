@@ -21,10 +21,10 @@
 			<tbody>
 				<tr ng-repeat="step in vm.steps track by step.stepTask.id">
 					<td>{{step.stepTask.name}}</td>
-					<td>{{step.stepContent.GroupId}}</td>
-					<td>{{step.stepTask.createdOn | date : format : "fulldate"}}</td>
+					<td>{{step.stepTask.peopleAssignments.potentialOwners[0].id}}</td>
+					<td>{{step.stepTask.taskData.createdOn | date : format : "fulldate"}}</td>
 					<td>{{step.endDate | date : format : "fulldate"}}</td>					
-					<td>{{step.stepTask.actualOwner.id}}</td>
+					<td>{{step.stepTask.taskData.actualOwner.id}}</td>
 
 				</tr>
 			</tbody>

@@ -19,6 +19,8 @@ import com.aft.jbpmcuy.service.UserService;
 import com.aft.jbpmcuy.service.dto.CircuitDTO;
 import com.aft.jbpmcuy.service.dto.CircuitInstanceDTO;
 import com.aft.jbpmcuy.service.dto.CircuitStepDTO;
+import com.aft.jbpmcuy.web.rest.errors.CustomParameterizedException;
+import com.aft.jbpmcuy.web.rest.errors.ErrorConstants;
 import com.codahale.metrics.annotation.Timed;
 
 /**
@@ -82,9 +84,17 @@ public class JBPMResource {
 	public void startTask(@RequestParam Long instanceId) {
 		log.debug("REST request to start the current availaible task of a given instance");
 
-		CircuitInstanceDTO currentCircuitInstance = jbpmService.getCircuitInstanceById(instanceId,
-				SecurityUtils.getCurrentUserLogin());
-		jbpmService.startCurrentStep(currentCircuitInstance.getCurrentStep(), SecurityUtils.getCurrentUserLogin());
+		try {
+
+			CircuitInstanceDTO currentCircuitInstance = jbpmService.getCircuitInstanceById(instanceId,
+					SecurityUtils.getCurrentUserLogin());
+			jbpmService.startCurrentStep(currentCircuitInstance.getCurrentStep(), SecurityUtils.getCurrentUserLogin());
+
+		} catch (Exception e) {
+			log.info("error", e);
+			throw new CustomParameterizedException(ErrorConstants.ERR_START_TASK_SERVER_ERROR,
+					ErrorConstants.ERR_START_TASK_SERVER_ERROR_DESCR, String.valueOf(instanceId));
+		}
 
 	}
 
@@ -92,9 +102,16 @@ public class JBPMResource {
 	@Timed
 	public void completeTask(@RequestParam Long instanceId) {
 		log.debug("REST request to complete a given task by doign a given action");
-		CircuitInstanceDTO currentCircuitInstance = jbpmService.getCircuitInstanceById(instanceId,
-				SecurityUtils.getCurrentUserLogin());
-		jbpmService.goToNextStep(currentCircuitInstance, SecurityUtils.getCurrentUserLogin());
+
+		try {
+			CircuitInstanceDTO currentCircuitInstance = jbpmService.getCircuitInstanceById(instanceId,
+					SecurityUtils.getCurrentUserLogin());
+			jbpmService.goToNextStep(currentCircuitInstance, SecurityUtils.getCurrentUserLogin());
+
+		} catch (Exception e) {
+			throw new CustomParameterizedException(ErrorConstants.ERR_COMPLETE_TASK_SERVER_ERROR,
+					ErrorConstants.ERR_COMPLETE_TASK_SERVER_ERROR_DESC, String.valueOf(instanceId));
+		}
 
 	}
 

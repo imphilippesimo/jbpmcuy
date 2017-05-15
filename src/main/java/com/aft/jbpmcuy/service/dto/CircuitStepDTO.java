@@ -4,63 +4,42 @@
 package com.aft.jbpmcuy.service.dto;
 
 import java.util.Date;
-import java.util.Map;
 
-import org.kie.api.task.model.TaskSummary;
+import org.kie.api.task.model.Task;
 
 /**
  * @author Philippe Simo
  *
  */
 public class CircuitStepDTO {
-	private CircuitDTO circuit;
-	private TaskSummary stepTask;
-	private Map<String, Object> stepContent;
+
+	private Task stepTask;
 	// The start date is already in the TaskSummary
 	private Date endDate;
+	private Boolean treatable;
 
 	/**
-	 * @param circuit
-	 * @param stepFolder
-	 * @param stepTask
-	 * @param map
-	 * @param banettes
+	 * @param awaitingTask
+	 * @param treatable
 	 */
-	public CircuitStepDTO(CircuitDTO circuit, TaskSummary stepTask, Map<String, Object> stepContent) {
+	public CircuitStepDTO(Task awaitingTask, Boolean treatable) {
+		this(awaitingTask);
+		this.treatable = treatable;
+
+	}
+
+	/**
+	 * @param awaitingTask
+	 */
+	public CircuitStepDTO(Task awaitingTask) {
 		super();
-		this.circuit = circuit;
-		this.stepTask = stepTask;
-		this.stepContent = stepContent;
-
-	}
-
-	public Map<String, Object> getStepContent() {
-		return stepContent;
-	}
-
-	public void setStepContent(Map<String, Object> stepContent) {
-		this.stepContent = stepContent;
-	}
-
-	/**
-	 * @return the circuit
-	 */
-	public CircuitDTO getCircuit() {
-		return circuit;
-	}
-
-	/**
-	 * @param circuit
-	 *            the circuit to set
-	 */
-	public void setCircuit(CircuitDTO circuit) {
-		this.circuit = circuit;
+		this.stepTask = awaitingTask;
 	}
 
 	/**
 	 * @return the stepTask
 	 */
-	public TaskSummary getStepTask() {
+	public Task getStepTask() {
 		return stepTask;
 	}
 
@@ -68,18 +47,8 @@ public class CircuitStepDTO {
 	 * @param stepTask
 	 *            the stepTask to set
 	 */
-	public void setStepTask(TaskSummary stepTask) {
+	public void setStepTask(Task stepTask) {
 		this.stepTask = stepTask;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "SignatureCircuitStepDTO [circuit=" + circuit + ",  stepTask=" + stepTask + "]";
 	}
 
 	/**
@@ -96,6 +65,14 @@ public class CircuitStepDTO {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public Boolean getTreatable() {
+		return treatable;
+	}
+
+	public void setTreatable(Boolean treatable) {
+		this.treatable = treatable;
 	}
 
 }

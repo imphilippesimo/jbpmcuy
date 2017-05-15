@@ -29,6 +29,8 @@ import org.kie.api.runtime.manager.audit.AuditService;
 import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.api.task.TaskService;
+import org.kie.api.task.model.OrganizationalEntity;
+import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.io.ResourceFactory;
 import org.kie.internal.runtime.manager.context.EmptyContext;
@@ -42,6 +44,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.aft.jbpmcuy.domain.Document;
+import com.aft.jbpmcuy.domain.Office;
+import com.aft.jbpmcuy.domain.Person;
 import com.aft.jbpmcuy.repository.DocumentRepository;
 import com.aft.jbpmcuy.repository.OfficeRepository;
 import com.aft.jbpmcuy.repository.PersonRepository;
@@ -81,6 +85,7 @@ public class JBPMService implements DisposableBean {
 	private PersonRepository personRepository;
 
 	private DocumentRepository documentRepository;
+	private InternalTaskService taskService;
 
 	public JBPMService(OfficeRepository officeRepository, UserRepository userRepository,
 			PersonRepository personRepository, DocumentRepository documentRepository) throws IOException {
@@ -170,9 +175,6 @@ public class JBPMService implements DisposableBean {
 
 		CircuitInstanceDTO sCircuitIns = null;
 
-		// Getting the runtime engine out of the runtime manager
-		RuntimeEngine engine = getRuntimeEngine();
-
 		// Process instance Starter
 		String starter = null;
 
@@ -180,21 +182,31 @@ public class JBPMService implements DisposableBean {
 		String documentRef = null;
 
 		// Setting the task Service from the runtime engine
-		TaskService taskService = engine.getTaskService();
+		TaskService taskService = getTaskService();
 
 		AuditService auditService = getAuditService();
 
 		// List of active process instances
 		List<? extends ProcessInstanceLog> processesList;
 
+		// List of tasks in the base
+		// List<Task> tasks = new ArrayList<Task>();
+
+		// List of use's tasks
+		// List<Task> userTasks = new ArrayList<Task>();
+
 		// For each signature circuit...
 		for (CircuitDTO circuit : getAllCircuits()) {
 
 			// get its active process instances list
+			// processesList =
+			// auditService.findActiveProcessInstances(circuit.getCircuitId());
 			processesList = auditService.findActiveProcessInstances(circuit.getCircuitId());
 
 			// For each active process instance...
 			for (ProcessInstanceLog pInstance : processesList) {
+
+				Boolean treatable = Boolean.FALSE;
 
 				/** get the process properties and feed the processInstance **/
 
@@ -219,24 +231,46 @@ public class JBPMService implements DisposableBean {
 				// getCompletedStepsByProcessInstanceId(
 				// pInstance.getProcessInstanceId());
 
-				sCircuitIns = new CircuitInstanceDTO(pInstance, starter, documentRef, circuit, null);
+				sCircuitIns = new CircuitInstanceDTO(pInstance, starter, documentRef, null);
 
-				// among <user>'s awaiting task in the base...
-				for (TaskSummary awaitingTask : taskService.getTasksAssignedAsPotentialOwner(potentialOwner, null)) {
+				// get user's tasks
+				// for (TaskSummary userTask :
+				// getTaskService().getTasksAssignedAsPotentialOwner(potentialOwner,
+				// null,
+				// null, null))
+				// userTasks.add(getTaskService().getTaskById(userTask.getId()));
+
+				// among awaiting task in the base...
+				for (Long awaitingTaskId : taskService.getTasksByProcessInstanceId(pInstance.getProcessInstanceId())) {
 					// logger.debug(awaitingTask);
 
-					// keep the one belonging to this process instance
-					if ((awaitingTask.getProcessInstanceId().equals(pInstance.getProcessInstanceId()))) {
+					Task awaitingTask = taskService.getTaskById(awaitingTaskId);
 
-						sCircuitIns.setCurrentStep(
-								new CircuitStepDTO(circuit, awaitingTask, getStepContent(awaitingTask.getId())));
-					}
+					// tasks.add(awaitingTask);
+
+					// keep the one belonging to this process instance
+					// if
+					// (((Long)(awaitingTask.getTaskData().getProcessInstanceId()).equals(pInstance.getProcessInstanceId())))
+					// {
+					// List<String> tasksPotOwners = new ArrayList<String>();
+					for (OrganizationalEntity ownerGroup : awaitingTask.getPeopleAssignments().getPotentialOwners())
+						if (isUserInGroup(potentialOwner, ownerGroup)) {
+							// tasksPotOwners.add(owner.getId());
+
+							// if (userTasks.contains(awaitingTask))
+							treatable = Boolean.TRUE;
+						} else {
+							logger.info("unfortunately user is not " + ownerGroup);
+						}
+					sCircuitIns.setCurrentStep(new CircuitStepDTO(awaitingTask, treatable));
+
+					// }
 
 				}
 				// if there is no current step for <user>, he is not
 				// involved on this instance right now
-				if (sCircuitIns.getCurrentStep() != null)
-					results.add(sCircuitIns);
+				// if (sCircuitIns.getCurrentStep() != null)
+				results.add(sCircuitIns);
 
 			}
 		}
@@ -245,6 +279,19 @@ public class JBPMService implements DisposableBean {
 
 		// returning the list of <user>'s circuit instances
 		return results;
+
+	}
+
+	private boolean isUserInGroup(String potentialOwner, OrganizationalEntity ownerGroup) {
+
+		Person person = personRepository.findOneByUserLogin(potentialOwner);
+		for (Office office : person.getOffices()) {
+			if (office.getName().equals(ownerGroup.getId())) {
+				logger.info("effectively user is in " + ownerGroup);
+				return Boolean.TRUE;
+			}
+		}
+		return Boolean.FALSE;
 
 	}
 
@@ -301,7 +348,10 @@ public class JBPMService implements DisposableBean {
 
 	private InternalTaskService getTaskService() {
 
-		return (InternalTaskService) getRuntimeEngine().getTaskService();
+		if (taskService != null)
+			return taskService;
+
+		return taskService = (InternalTaskService) getRuntimeEngine().getTaskService();
 	}
 
 	public CircuitInstanceDTO getCircuitInstanceById(Long circuitInstanceId, String potentialOwner) {
@@ -351,25 +401,30 @@ public class JBPMService implements DisposableBean {
 	// Retrieve step execution history
 	public List<CircuitStepDTO> getCompletedStepsByProcessInstanceId(CircuitInstanceDTO instance) {
 
-		List<TaskSummary> tasks = getTaskService()
+		List<Task> tasks = new ArrayList<Task>();
+
+		List<TaskSummary> taskSummaries = getTaskService()
 				.getCompletedTasksByProcessId(instance.getProcessInstanceInfo().getProcessInstanceId());
+
+		for (TaskSummary task : taskSummaries) {
+			tasks.add(getTaskService().getTaskById(task.getId()));
+		}
+
 		List<CircuitStepDTO> result = new ArrayList<CircuitStepDTO>();
 
 		// we store task creation dates to set them as previous tasks end dates
 		List<Date> taskEndDates = new ArrayList<Date>();
 
-		for (TaskSummary taskSummary : tasks) {
-			logger.info("Task completed : " + taskSummary.toString());
-			String circuitId = taskSummary.getProcessId();
+		for (Task _task : tasks) {
+			logger.info("Task completed : " + _task.toString());
 			// storing the creation date (it will be the previous task end date)
-			taskEndDates.add(taskSummary.getCreatedOn());
-			CircuitDTO circuit = getCircuitById(circuitId);
-			result.add(new CircuitStepDTO(circuit, taskSummary, getStepContent(taskSummary.getId())));
+			taskEndDates.add(_task.getTaskData().getCreatedOn());
+			result.add(new CircuitStepDTO(_task));
 		}
 
 		// add the creation date of the next non completed task, to be set as
 		// the end date of the last completed task
-		taskEndDates.add(instance.getCurrentStep().getStepTask().getCreatedOn());
+		taskEndDates.add(instance.getCurrentStep().getStepTask().getTaskData().getCreatedOn());
 
 		// update the completed tasks while setting their end dates
 		for (int i = 0; i < result.size(); i++) {
