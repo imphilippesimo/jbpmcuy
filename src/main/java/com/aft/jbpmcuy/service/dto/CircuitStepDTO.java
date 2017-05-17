@@ -75,4 +75,10 @@ public class CircuitStepDTO {
 		this.treatable = treatable;
 	}
 
+	@Override
+	public String toString() {
+		return "CircuitStepDTO [stepTask=" + stepTask.getName() + ", endDate=" + endDate + ", treatable=" + treatable
+				+ "]";
+	}
+
 }

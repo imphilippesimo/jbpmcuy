@@ -29,11 +29,30 @@
                     </a>
                 </li>
                 
-                 <li ui-sref-active="active" ng-switch-when="true" >                    
-                    <a ui-sref="folders" ng-click="vm.collapseNavbar()">
-                        <span class="glyphicon glyphicon-inbox"></span>
-                        <span class="hidden-sm" data-translate="global.menu.folders">Folders</span>
+<!--                  <li ui-sref-active="active" ng-switch-when="true" >                     -->
+<!--                     <a ui-sref="folders" ng-click="vm.collapseNavbar()"> -->
+<!--                         <span class="glyphicon glyphicon-inbox"></span> -->
+<!--                         <span class="hidden-sm" data-translate="global.menu.folders">Folders</span> -->
+<!--                     </a> -->
+<!--                 </li> -->
+                
+                 <li ui-sref-active="active" uib-dropdown class="dropdown pointer" >
+                    <a class="dropdown-toggle" uib-dropdown-toggle href="">
+                        <span>
+                            <span class="glyphicon glyphicon-inbox"></span>
+                            <span class="hidden-sm" data-translate="global.menu.folders">Folders</span>
+                            <b class="caret"></b>
+                        </span>
                     </a>
+                    <ul class="dropdown-menu" uib-dropdown-menu >
+                        <li>
+                            <a href="" ui-sref="folders" ng-click="vm.collapseNavbar();">In progress</a>
+                        </li>
+                         <li>
+                            <a href="" ui-sref="folders({completed:true})" ng-click="vm.collapseNavbar();">Completed</a>
+                        </li>
+                       
+                    </ul>
                 </li>
                 
                 <li ng-class="{active: vm.$state.includes('entity')}" ng-switch-when="true" uib-dropdown class="dropdown pointer">
@@ -185,6 +204,7 @@
                         </li>
                     </ul>
                 </li>
+               
             </ul>
         </div>
     </div>

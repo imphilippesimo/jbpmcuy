@@ -10,7 +10,7 @@
 				'folders',
 				{
 					parent : 'app',
-					url : '/folders',
+					url : '/folders?completed',
 					data : {
 
 						authorities : [ 'ROLE_USER' ],
@@ -102,6 +102,41 @@
 									return currentStateData;
 								} ]
 					}
-				});
+				}).state(
+						'folder-global-status',
+						{
+							parent : 'app',
+							url : '/folder/global/status',
+							data : {
+								authorities : [ 'ROLE_USER' ],
+							// pageTitle : 'jbpmcuyApp.folder.detail.title'
+							},
+							views : {
+								'content@' : {
+									templateUrl : 'app/folders/folder-global-status.html',
+									controller : 'FolderGlobalStatusController',
+									controllerAs : 'vm'
+								}
+							},
+							resolve : {
+								translatePartialLoader : [ '$translate',
+										'$translatePartialLoader',
+										function($translate, $translatePartialLoader) {
+											$translatePartialLoader.addPart('folders');
+											return $translate.refresh();
+										} ],
+								previousState : [
+										"$state",
+										function($state) {
+											var currentStateData = {
+												name : $state.current.name || 'folder',
+												params : $state.params,
+												url : $state.href($state.current.name,
+														$state.params)
+											};
+											return currentStateData;
+										} ]
+							}
+						});
 	}
 })();

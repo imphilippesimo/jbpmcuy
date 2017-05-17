@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,9 +74,15 @@ public class JBPMResource {
 	@Timed
 	public List<CircuitInstanceDTO> getUserTasks() {
 		log.debug("REST request to get a given user awaiting's tasks");
-		List<CircuitInstanceDTO> circuitInstances = jbpmService
-				.getCircuitInstances(SecurityUtils.getCurrentUserLogin());
-		return circuitInstances;
+		return jbpmService.getCircuitInstances(SecurityUtils.getCurrentUserLogin());
+
+	}
+
+	@GetMapping("/circuits/instances/all")
+	@Timed
+	public List<ProcessInstanceLog> getAllInstances() {
+		log.debug("REST request to get all circuit instances");
+		return jbpmService.getAllCircuitInstances();
 
 	}
 
@@ -94,6 +101,22 @@ public class JBPMResource {
 			log.info("error", e);
 			throw new CustomParameterizedException(ErrorConstants.ERR_START_TASK_SERVER_ERROR,
 					ErrorConstants.ERR_START_TASK_SERVER_ERROR_DESCR, String.valueOf(instanceId));
+		}
+
+	}
+
+	@GetMapping("/circuits/task/delegate")
+	@Timed
+	public void delegateTask(@RequestParam Long instanceId, @RequestParam String targetUserId) {
+		log.debug("REST request to delegate the current availaible task of a given instance to a user");
+
+		try {
+
+			jbpmService.delegateTask(instanceId, SecurityUtils.getCurrentUserLogin(), targetUserId);
+		} catch (RuntimeException e) {
+			log.info("error", e);
+			throw new CustomParameterizedException(ErrorConstants.ERR_DELEGATE_TASK_SERVER_ERROR,
+					ErrorConstants.ERR_DELEGATE_TASK_SERVER_PERMISSION_ERROR_DESCR, String.valueOf(instanceId));
 		}
 
 	}

@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
@@ -30,6 +31,7 @@ import org.kie.api.runtime.manager.audit.ProcessInstanceLog;
 import org.kie.api.runtime.manager.audit.VariableInstanceLog;
 import org.kie.api.task.TaskService;
 import org.kie.api.task.model.OrganizationalEntity;
+import org.kie.api.task.model.Status;
 import org.kie.api.task.model.Task;
 import org.kie.api.task.model.TaskSummary;
 import org.kie.internal.io.ResourceFactory;
@@ -168,6 +170,13 @@ public class JBPMService implements DisposableBean {
 
 	}
 
+	public List<ProcessInstanceLog> getAllCircuitInstances() {
+		List<ProcessInstanceLog> instances = new ArrayList<ProcessInstanceLog>();
+		for (CircuitDTO circuit : getAllCircuits())
+			instances.addAll(getAuditService().findProcessInstances(circuit.getCircuitId()));
+		return instances;
+	}
+
 	public List<CircuitInstanceDTO> getCircuitInstances(String potentialOwner) {
 
 		// list of signature circuit instances on which <user> can act
@@ -201,7 +210,7 @@ public class JBPMService implements DisposableBean {
 			// get its active process instances list
 			// processesList =
 			// auditService.findActiveProcessInstances(circuit.getCircuitId());
-			processesList = auditService.findActiveProcessInstances(circuit.getCircuitId());
+			processesList = auditService.findProcessInstances(circuit.getCircuitId());
 
 			// For each active process instance...
 			for (ProcessInstanceLog pInstance : processesList) {
@@ -240,6 +249,9 @@ public class JBPMService implements DisposableBean {
 				// null, null))
 				// userTasks.add(getTaskService().getTaskById(userTask.getId()));
 
+				// if the duration is null, the process instance is still
+				// active, so we can retrieve its current awaiting task
+				// if (pInstance.getDuration() == null) {
 				// among awaiting task in the base...
 				for (Long awaitingTaskId : taskService.getTasksByProcessInstanceId(pInstance.getProcessInstanceId())) {
 					// logger.debug(awaitingTask);
@@ -252,9 +264,10 @@ public class JBPMService implements DisposableBean {
 					// if
 					// (((Long)(awaitingTask.getTaskData().getProcessInstanceId()).equals(pInstance.getProcessInstanceId())))
 					// {
-					// List<String> tasksPotOwners = new ArrayList<String>();
+					// List<String> tasksPotOwners = new
+					// ArrayList<String>();
 					for (OrganizationalEntity ownerGroup : awaitingTask.getPeopleAssignments().getPotentialOwners())
-						if (isUserInGroup(potentialOwner, ownerGroup)) {
+						if (isUserInGroup(potentialOwner, ownerGroup.getId())) {
 							// tasksPotOwners.add(owner.getId());
 
 							// if (userTasks.contains(awaitingTask))
@@ -267,6 +280,8 @@ public class JBPMService implements DisposableBean {
 					// }
 
 				}
+				// }
+
 				// if there is no current step for <user>, he is not
 				// involved on this instance right now
 				// if (sCircuitIns.getCurrentStep() != null)
@@ -282,12 +297,35 @@ public class JBPMService implements DisposableBean {
 
 	}
 
-	private boolean isUserInGroup(String potentialOwner, OrganizationalEntity ownerGroup) {
+	public void delegateTask(Long instanceId, String userId, String targetUserId) {
+		Boolean delegatable = Boolean.FALSE;
+
+		Person user = personRepository.findOneByUserLogin(userId);
+		Set<Office> userIdGroups = user.getOffices();
+
+		// check if targetUserId is within one of userId groups
+		for (Office group : userIdGroups)
+			if (isUserInGroup(targetUserId, group.getName())) {
+				delegatable = Boolean.TRUE;
+				break;
+			}
+
+		if (delegatable)
+			getTaskService().delegate(getCircuitInstanceById(instanceId, userId).getCurrentStep().getStepTask().getId(),
+					userId, targetUserId);
+		else {
+			logger.info("=======can not delegate task to the user=========");
+			throw new RuntimeException();
+		}
+
+	}
+
+	private boolean isUserInGroup(String potentialOwner, String ownerGroupIdAsString) {
 
 		Person person = personRepository.findOneByUserLogin(potentialOwner);
 		for (Office office : person.getOffices()) {
-			if (office.getName().equals(ownerGroup.getId())) {
-				logger.info("effectively user is in " + ownerGroup);
+			if (office.getName().equals(ownerGroupIdAsString)) {
+				logger.info("effectively user is in " + ownerGroupIdAsString);
 				return Boolean.TRUE;
 			}
 		}
@@ -336,8 +374,9 @@ public class JBPMService implements DisposableBean {
 		// Getting the task service out of the runtime manager
 		TaskService taskService = getTaskService();
 
-		// claiming the task
-		taskService.claim(currentStep.getStepTask().getId(), starter);
+		// claiming the task first if it is not already reserved
+		if (!currentStep.getStepTask().getTaskData().getStatus().equals(Status.Reserved))
+			taskService.claim(currentStep.getStepTask().getId(), starter);
 
 		// starting the task
 		taskService.start(currentStep.getStepTask().getId(), starter);
@@ -407,7 +446,7 @@ public class JBPMService implements DisposableBean {
 				.getCompletedTasksByProcessId(instance.getProcessInstanceInfo().getProcessInstanceId());
 
 		for (TaskSummary task : taskSummaries) {
-			tasks.add(getTaskService().getTaskById(task.getId()));
+			tasks.add(0, getTaskService().getTaskById(task.getId()));
 		}
 
 		List<CircuitStepDTO> result = new ArrayList<CircuitStepDTO>();
@@ -416,22 +455,32 @@ public class JBPMService implements DisposableBean {
 		List<Date> taskEndDates = new ArrayList<Date>();
 
 		for (Task _task : tasks) {
-			logger.info("Task completed : " + _task.toString());
+			logger.info("Task completed : " + _task.getName());
 			// storing the creation date (it will be the previous task end date)
 			taskEndDates.add(_task.getTaskData().getCreatedOn());
 			result.add(new CircuitStepDTO(_task));
 		}
 
-		// add the creation date of the next non completed task, to be set as
-		// the end date of the last completed task
-		taskEndDates.add(instance.getCurrentStep().getStepTask().getTaskData().getCreatedOn());
+		Date nextEndDate = instance.getProcessInstanceInfo().getEnd();
+
+		if (nextEndDate == null) {
+
+			// add the creation date of the next non completed task, to be set
+			// as the end date of the last completed task
+			taskEndDates.add(instance.getCurrentStep().getStepTask().getTaskData().getCreatedOn());
+		} else {
+			taskEndDates.add(nextEndDate);
+		}
 
 		// update the completed tasks while setting their end dates
 		for (int i = 0; i < result.size(); i++) {
 			CircuitStepDTO step = result.get(i);
+			logger.info("Setting end date to " + taskEndDates.get(i + 1));
 			step.setEndDate(taskEndDates.get(i + 1));
 			result.set(i, step);
 		}
+
+		logger.info("results======== " + result.toString());
 
 		return result;
 

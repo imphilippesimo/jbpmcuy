@@ -1,4 +1,5 @@
 <div>
+
 	<jhi-alert></jhi-alert>
 	<div class="table-responsive">
 		<table class="jh-table table table-striped">
@@ -6,32 +7,18 @@
 				<tr>
 					<!--                     Process instance info: id -->
 					<th><span data-translate="global.field.id">ID</span></th>
-					<!--                     Folder Name -->
-					<th><span data-translate="folders.name">Name</span></th>
+					
 					<!--                     Process Name -->
 					<th><span data-translate="folders.nature">Nature</span></th>
 					<!--                     Process instance info: start -->
-					<th><span data-translate="folders.startedOn">Initialized</span></th>
-					<!--                      Process instance info: starter -->
-					<th><span data-translate="folders.initializer">Initializer</span></th>
-					<!--                       Step task: name -->
-					<th><span data-translate="folders.task.toDo ">Waiting for</span></th>
-					<!--                       Step task: status -->
-					<th><span data-translate="folders.task.status">Status</span></th>
+					<th><span data-translate="folders.startedOn">Initialized</span></th>					
 					<!--                       Step task: createdOn -->
-					<th><span data-translate="folders.task.inThisServiceSince">In
-							this service since</span></th>
-					<!--                       Step task: actualOwner -->
-					<th><span data-translate="folders.task.handledBy">Handled
-							by</span></th>
-
-
-					<th></th>
+					<th><span data-translate="folders.task.inThisServiceSince">In this service since</span></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr
-					ng-repeat="folder in vm.folders | filter:vm.filterRecords track by folder.processInstanceInfo.processInstanceId  ">
+					ng-repeat="folder in vm.folders track by folder.processInstanceInfo.processInstanceId">
 					<td>{{folder.processInstanceInfo.processInstanceId}}</td>
 					<td>{{folder.documentRef}}</td>
 					<td>{{folder.processInstanceInfo.processName}}</td>
@@ -46,7 +33,7 @@
 
 					<td class="text-right">
 						<div class="btn-group flex-btn-group-container">
-							<button ng-if="(((folder.currentStep.stepTask.taskData.actualOwner.id==vm.currentLogin)&&(!vm.completed))||(!folder.currentStep.stepTask.taskData.actualOwner))&&(folder.currentStep.treatable)" type="submit"
+							<button ng-if="((folder.currentStep.stepTask.taskData.actualOwner.id==vm.currentLogin)||(!folder.currentStep.stepTask.taskData.actualOwner))&&(folder.currentStep.treatable)" type="submit"
 								ui-sref="folder-detail({instanceId:folder.processInstanceInfo.processInstanceId, docRef:folder.documentRef, handler:folder.currentStep.stepTask.taskData.actualOwner.id})"
 								class="btn btn-info btn-sm">
 								<span class="glyphicon glyphicon-pencil"></span> <span

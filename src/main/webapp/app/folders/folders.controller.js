@@ -4,12 +4,14 @@
 	angular.module('jbpmcuyApp').controller('FolderController',
 			FolderController);
 
-	FolderController.$inject = [ 'CircuitsService', 'Principal' ];
+	FolderController.$inject = [ 'CircuitsService', '$stateParams', 'Principal' ];
 
-	function FolderController(CircuitsService, Principal) {
+	function FolderController(CircuitsService, $stateParams, Principal) {
 
 		var vm = this;
 		vm.folders = [];
+		vm.filterRecords = filterRecords;
+		vm.completed = $stateParams.completed;
 
 		vm.currentLogin = null;
 
@@ -36,6 +38,12 @@
 				console.log(folders);
 			});
 
+		}
+
+		function filterRecords(folder) {
+			if (!vm.completed)
+				return folder.processInstanceInfo.duration == null;
+			return folder.processInstanceInfo.duration != null
 		}
 
 	}
